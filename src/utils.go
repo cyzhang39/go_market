@@ -74,7 +74,24 @@ func Search() gin.HandlerFunc {
 }
 
 func View() gin.HandlerFunc {
-	
+	return func(ctx *gin.Context) {
+		c, cancel := context.WithTimeout(context.Background(), 100 *time.Second)
+		var prods models.Product
+		defer cancel()
+		err := ctx.BindJSON(&prods)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return 
+		}
+		prods.ID = primitive.NewObjectID()
+		_, err = products.InsertOne(c, prods)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Could not add item"})
+			return
+		}
+		defer cancel()
+		ctx.JSON(http.StatusOK, "Item added successfully.")
+	}
 }
 
 func Product() gin.HandlerFunc {
