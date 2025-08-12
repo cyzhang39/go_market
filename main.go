@@ -1,0 +1,31 @@
+package main
+
+import (
+	"os"
+	"github.com/cyzhang39/go_market/src"
+	"github.com/cyzhang39/go_market/db"
+	"github.com/cyzhang39/go_market/middleware"
+	"github.com/cyzhang39/go_market/routes"
+	"github.com/gin-gonic/gin"
+	"log"
+)
+
+func main() {
+	port := os.Getenv("PORT")
+	if port == ""{
+		port = "8000"
+	}
+
+	server := src.NewApp(db.Products(db.Client, "products"), db.Users(db.Client, "users"))
+
+	router := gin.New()
+	router.Use(gin.Logger())
+	routes.Routes(router)
+	router.Use(middleware.Authenticate())
+	router.GET("/add", server.CartAdd())
+	router.GET("/remove", server.CartRemove())
+	router.GET("/checkout", server.CartBuy())
+	router.GET("/buy", server.Buy())
+	
+	log.Fatal(router.Run(":" + port))
+}
