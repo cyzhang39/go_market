@@ -33,14 +33,14 @@ func (app *App) CartAdd() gin.HandlerFunc {
 		pid := ctx.Query("id")
 		if pid == "" {
 			log.Println("Invalid product id")
-			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("Invalid product id"))
+			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("invalid product id"))
 			return
 		}
 
 		uid := ctx.Query("userID")
 		if uid == ""{
 			log.Println("Invalide user id")
-			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("Invalid user id"))
+			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("invalid user id"))
 			return
 		}
 
@@ -66,14 +66,14 @@ func (app *App) CartRemove() gin.HandlerFunc {
 		pid := ctx.Query("id")
 		if pid == "" {
 			log.Println("Invalid product id")
-			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("Invalid product id"))
+			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("invalid product id"))
 			return
 		}
 
 		uid := ctx.Query("userID")
 		if uid == ""{
 			log.Println("Invalide user id")
-			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("Invalid user id"))
+			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("invalid user id"))
 			return
 		}
 
@@ -168,14 +168,14 @@ func (app *App) Buy() gin.HandlerFunc {
 		pid := ctx.Query("id")
 		if pid == "" {
 			log.Println("Invalid product id")
-			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("Invalid product id"))
+			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("invalid product id"))
 			return
 		}
 
 		uid := ctx.Query("userID")
 		if uid == ""{
 			log.Println("Invalide user id")
-			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("Invalid user id"))
+			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("invalid user id"))
 			return
 		}
 

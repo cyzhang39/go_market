@@ -1,0 +1,20 @@
+version: '1.1'
+
+services:
+
+  mongo:
+    image: mongo:5.0.3
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: testername
+      MONGO_INITDB_ROOT_PASSWORD: testerpass
+
+  mongo-express:
+    image: mongo-express
+    ports:
+     - 8081:8081
+    environment:
+      ME_MONGO_INITDB_ROOT_USERNAME: testername
+      ME_MONGO_INITDB_ROOT_PASSWORD: testerpass
+      ME_CONFIG_MONGODB_URL: mongodb://testername:testerpass@mongo:27017/
