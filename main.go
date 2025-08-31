@@ -16,7 +16,7 @@ func main() {
 		port = "8000"
 	}
 
-	server := src.NewApp(db.Products(db.Client, "products"), db.Users(db.Client, "users"))
+	server := src.NewApp(db.CollectionDB(db.Client, "products"), db.CollectionDB(db.Client, "users"))
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -24,8 +24,13 @@ func main() {
 	router.Use(middleware.Authenticate())
 	router.GET("/add", server.CartAdd())
 	router.GET("/remove", server.CartRemove())
+	router.GET("list", src.CartGet())
 	router.GET("/checkout", server.CartBuy())
 	router.GET("/buy", server.Buy())
+	router.POST("addressadd", src.AddressAdd())
+	router.PUT("/addresshomeedit", src.HomeEdit())
+	router.PUT("/addressworkedit", src.WorkEdit())
+	router.GET("/addressdel", src.AddressDelete())
 	
 	log.Fatal(router.Run(":" + port))
 }

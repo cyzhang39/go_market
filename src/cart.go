@@ -17,14 +17,13 @@ import (
 
 type App struct {
 	products *mongo.Collection
-	users *mongo.Collection
-
+	users    *mongo.Collection
 }
 
 func NewApp(products *mongo.Collection, users *mongo.Collection) *App {
-	return &App {
+	return &App{
 		products: products,
-		users: users,
+		users:    users,
 	}
 }
 
@@ -38,7 +37,7 @@ func (app *App) CartAdd() gin.HandlerFunc {
 		}
 
 		uid := ctx.Query("userID")
-		if uid == ""{
+		if uid == "" {
 			log.Println("Invalide user id")
 			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("invalid user id"))
 			return
@@ -50,7 +49,7 @@ func (app *App) CartAdd() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c, cancel := context.WithTimeout(context.Background(), 8 * time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 8*time.Second)
 		defer cancel()
 		err = db.CartAdd(c, app.products, app.users, pHex, uid)
 		if err != nil {
@@ -71,7 +70,7 @@ func (app *App) CartRemove() gin.HandlerFunc {
 		}
 
 		uid := ctx.Query("userID")
-		if uid == ""{
+		if uid == "" {
 			log.Println("Invalide user id")
 			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("invalid user id"))
 			return
@@ -83,7 +82,7 @@ func (app *App) CartRemove() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c, cancel := context.WithTimeout(context.Background(), 8 * time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 8*time.Second)
 		defer cancel()
 
 		err = db.CartRemove(c, app.products, app.users, pHex, uid)
@@ -107,7 +106,7 @@ func CartGet() gin.HandlerFunc {
 		}
 
 		uHex, _ := primitive.ObjectIDFromHex(uid)
-		c, cancel := context.WithTimeout(context.Background(), 100 * time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 
 		var cart models.User
@@ -118,8 +117,8 @@ func CartGet() gin.HandlerFunc {
 			return
 		}
 		match := bson.D{{Key: "$match", Value: bson.D{primitive.E{Key: "id", Value: uHex}}}}
-		ret := bson.D{{Key: "$ret", Value: bson.D{primitive.E{Key: "path", Value: "$cart"}}}}
-		group := bson.D{{Key: "$group", Value: bson.D{primitive.E{Key: "id", Value: "$id"}, {Key: "total", Value: bson.D{primitive.E{Key: "$sum", Value: "$cart.price"}}}}}}
+		ret := bson.D{{Key: "$unwind", Value: bson.D{primitive.E{Key: "path", Value: "$cart"}}}}
+		group := bson.D{{Key: "$group", Value: bson.D{primitive.E{Key: "_id", Value: "$id"}, {Key: "total", Value: bson.D{primitive.E{Key: "$sum", Value: "$cart.price"}}}}}}
 		result, err := users.Aggregate(c, mongo.Pipeline{match, ret, group})
 		if err != nil {
 			log.Println(err)
@@ -139,8 +138,6 @@ func CartGet() gin.HandlerFunc {
 
 		c.Done()
 
-
-
 	}
 }
 
@@ -150,7 +147,7 @@ func (app *App) CartBuy() gin.HandlerFunc {
 		if uid == "" {
 			log.Panic("Invalid user id")
 			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("Invalid user id"))
-			// return 
+			// return
 		}
 		c, cancel := context.WithTimeout(context.Background(), 100 * time.Second)
 		defer cancel()
@@ -173,7 +170,7 @@ func (app *App) Buy() gin.HandlerFunc {
 		}
 
 		uid := ctx.Query("userID")
-		if uid == ""{
+		if uid == "" {
 			log.Println("Invalide user id")
 			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("invalid user id"))
 			return
@@ -185,7 +182,7 @@ func (app *App) Buy() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c, cancel := context.WithTimeout(context.Background(), 8 * time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 8*time.Second)
 		defer cancel()
 
 		err = db.Buy(c, app.products, app.users, pHex, uid)

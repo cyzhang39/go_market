@@ -17,7 +17,7 @@ func MongoDatabase() *mongo.Client {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb://testername:testerpass@localhost:27017"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,12 +31,8 @@ func MongoDatabase() *mongo.Client {
 	return client
 }
 
-	var Client *mongo.Client = MongoDatabase()
+var Client *mongo.Client = MongoDatabase()
 
-func Products(client *mongo.Client, name string) *mongo.Collection {
-	return client.Database("goMarket").Collection(name)
-}
-
-func Users(client *mongo.Client, name string) *mongo.Collection {
+func CollectionDB(client *mongo.Client, name string) *mongo.Collection {
 	return client.Database("goMarket").Collection(name)
 }

@@ -11,7 +11,7 @@ type User struct {
 	FirstName   *string            `json:"firstName" validate:"required,min=1,max=25"`
 	LastName    *string            `json:"lastName" validate:"required,min=1,max=25"`
 	Password    *string            `json:"password" validate:"required,min=8,max=32"`
-	Email       *string            `json:"email" validate:"required"`
+	Email       *string            `json:"email" validate:"email,required"`
 	Phone       *string            `json:"phone"`
 	Token       *string            `json:"token"`
 	Refresh      *string            `json:"refresh"`
@@ -26,7 +26,7 @@ type User struct {
 type Product struct {
 	ID     primitive.ObjectID `bson:"id"`
 	Name   *string            `json:"name"`
-	Price  *float32           `json:"price"`
+	Price  *float64           `json:"price"`
 	Rating *float32           `json:"rating"`
 	Img    *string            `json:"img"`
 }
@@ -34,7 +34,7 @@ type Product struct {
 type UserProd struct {
 	ID     primitive.ObjectID `bson:"id"`
 	Name   *string            `json:"name" bson:"name"`
-	Price  float32            `json:"price" bson:"price"`
+	Price  float64            `json:"price" bson:"price"`
 	Rating *float32           `json:"rating" bson:"rating"`
 	Img    *string            `json:"img" bson:"img"`
 }
@@ -44,14 +44,14 @@ type Address struct {
 	House  *string            `json:"house" bson:"house"`
 	Street *string            `json:"street" bson:"street"`
 	City   *string            `json:"city" bson:"city"`
-	Postal *uint8             `json:"postal" bson:"postal"`
+	Postal *string             `json:"postal" bson:"postal"`
 }
 
 type Order struct {
 	ID        primitive.ObjectID `bson:"id"`
 	Cart      []UserProd         `json:"cart" bson:"cart"`
 	OrderTime time.Time          `json:"orderTime" bson:"orderTime"`
-	Price     float32            `json:"price" bson:"price"`
+	Price     float64            `json:"price" bson:"price"`
 	DC        *float32           `json:"dc" bson:"dc"`
 	Payment   Payment            `json:"payment" bson:"payment"`
 }

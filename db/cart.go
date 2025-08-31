@@ -12,29 +12,29 @@ import (
 )
 
 var (
-	InvalidProductErr = errors.New("Invalid Product")
-	InvalidUserErr = errors.New("Invalid User")
-	InvalidCartErr = errors.New("Unable to process cart action")
+	ErrInvalidProduct = errors.New("invalid Product")
+	ErrInvalidUser = errors.New("invalid User")
+	ErrInvalidCart = errors.New("unable to process cart action")
 )
 
 func CartAdd(ctx context.Context, products *mongo.Collection, users *mongo.Collection, pid primitive.ObjectID, uid string) error {
 	search, err := products.Find(ctx, bson.M{"id": pid})
 	if err != nil {
 		log.Println(err)
-		return InvalidCartErr
+		return ErrInvalidCart
 	}
 
 	var uProd []models.UserProd
 	err = search.All(ctx, &uProd)
 	if err != nil {
 		log.Println(err)
-		return InvalidProductErr
+		return ErrInvalidProduct
 	}
 
 	uHex, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
 		log.Println(err)
-		return InvalidUserErr
+		return ErrInvalidUser
 	}
 
 	idx := bson.D{primitive.E{Key: "id", Value: uHex}}
@@ -42,7 +42,7 @@ func CartAdd(ctx context.Context, products *mongo.Collection, users *mongo.Colle
 
 	_, err = users.UpdateOne(ctx, idx, update)
 	if err != nil {
-		return InvalidUserErr
+		return ErrInvalidUser
 	}
 	return nil 
 
@@ -52,7 +52,7 @@ func CartRemove(ctx context.Context, products *mongo.Collection, users *mongo.Co
 	uHex, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
 		log.Println(err)
-		return InvalidUserErr
+		return ErrInvalidUser
 	}
 
 	idx := bson.D(primitive.D{primitive.E{Key: "id", Value: uHex}})
@@ -60,7 +60,7 @@ func CartRemove(ctx context.Context, products *mongo.Collection, users *mongo.Co
 
 	_, err = users.UpdateMany(ctx, idx, update)
 	if err != nil {
-		return InvalidCartErr
+		return ErrInvalidCart
 	}
 	return nil
 }
@@ -73,7 +73,7 @@ func CartBuy(ctx context.Context, users *mongo.Collection, uid string) error {
 	uHex, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
 		log.Println(err)
-		return InvalidUserErr
+		return ErrInvalidUser
 	}
 	var user models.User
 	var order models.Order
@@ -84,7 +84,7 @@ func CartBuy(ctx context.Context, users *mongo.Collection, uid string) error {
 	order.Payment.Cash = true
 
 	ret := bson.D{{Key: "$unwind", Value: bson.D{primitive.E{Key: "path", Value: "$cart"}}}}
-	group := bson.D{{Key: "$group", Value: bson.D{primitive.E{Key: "id", Value: "$id"}, {Key: "total", Value: bson.D{primitive.E{Key: "$sum", Value: "$cart.price"}}}}}}
+	group := bson.D{{Key: "$group", Value: bson.D{primitive.E{Key: "_id", Value: "$id"}, {Key: "total", Value: bson.D{primitive.E{Key: "$sum", Value: "$cart.price"}}}}}}
 	res, err := users.Aggregate(ctx, mongo.Pipeline{ret, group})
 	ctx.Done()
 	if err != nil {
@@ -96,13 +96,13 @@ func CartBuy(ctx context.Context, users *mongo.Collection, uid string) error {
 	if err != nil {
 		panic(err)
 	}
-	var price float32
+	var price float64
 	for _, item := range uCart {
 		p := item["total"]
-		price = p.(float32)
+		price = p.(float64)
 
 	}
-	order.Price = float32(price)
+	order.Price = float64(price)
 
 	idx := bson.D{primitive.E{Key: "id", Value: uHex}}
 	update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "orders", Value: order}}}}
@@ -139,7 +139,7 @@ func Buy(ctx context.Context, products *mongo.Collection, users *mongo.Collectio
 	uHex, err := primitive.ObjectIDFromHex(uid)
 	if err != nil {
 		log.Println(err)
-		return InvalidUserErr
+		return ErrInvalidUser
 	}
 
 	var uProd models.UserProd

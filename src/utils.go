@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	gen "github.com/cyzhang39/go_market/auth"
 	"github.com/cyzhang39/go_market/db"
 	"github.com/cyzhang39/go_market/models"
 	"github.com/gin-gonic/gin"
@@ -15,13 +16,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
-	gen "github.com/cyzhang39/go_market/auth"
 )
 
 var (
-	products *mongo.Collection = db.Products(db.Client, "products")
-	users *mongo.Collection = db.Users(db.Client, "users")
-	validate = validator.New()
+	products *mongo.Collection = db.CollectionDB(db.Client, "products")
+	users    *mongo.Collection = db.CollectionDB(db.Client, "users")
+	validate                   = validator.New()
 )
 
 func HashPassword(password string) string {
@@ -33,7 +33,7 @@ func HashPassword(password string) string {
 }
 
 func Verify(entered string, stored string) (bool, string) {
-	err := bcrypt.CompareHashAndPassword([]byte(entered), []byte(stored))
+	err := bcrypt.CompareHashAndPassword([]byte(stored), []byte(entered))
 	isValid := true
 	msg := ""
 	if err != nil {
@@ -43,10 +43,10 @@ func Verify(entered string, stored string) (bool, string) {
 	return isValid, msg
 }
 
-func Search() gin.HandlerFunc {
+func View() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var lst []models.Product
-		var c, cancel = context.WithTimeout(context.Background(), 100 * time.Second)
+		var c, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 
 		cs, err := products.Find(c, bson.D{{}})
@@ -73,15 +73,15 @@ func Search() gin.HandlerFunc {
 	}
 }
 
-func View() gin.HandlerFunc {
+func AdminAdd() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100 *time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		var prods models.Product
 		defer cancel()
 		err := ctx.BindJSON(&prods)
 		if err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return 
+			return
 		}
 		prods.ID = primitive.NewObjectID()
 		_, err = products.InsertOne(c, prods)
@@ -94,7 +94,7 @@ func View() gin.HandlerFunc {
 	}
 }
 
-func Product() gin.HandlerFunc {
+func Search() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		var prod []models.Product
 		query := ctx.Query("name")
@@ -106,10 +106,10 @@ func Product() gin.HandlerFunc {
 			return
 		}
 
-		c, cancel := context.WithTimeout(context.Background(), 100 * time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 
-		result, err := products.Find(c, bson.M{"Name": bson.M{"$regex": query}})
+		result, err := products.Find(c, bson.M{"name": bson.M{"$regex": query}})
 		if err != nil {
 			ctx.IndentedJSON(http.StatusInternalServerError, "Failed to index with given query")
 			return
@@ -135,39 +135,45 @@ func Product() gin.HandlerFunc {
 }
 
 func Signup() gin.HandlerFunc {
-	return func(c *gin.Context)  {
-		ctx, cancel := context.WithTimeout(context.Background(), 100 * time.Second)
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 		var user models.User
 		err := c.BindJSON(&user)
+		// fmt.Println(1)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 		res := validate.Struct(user)
+		// fmt.Println(2)
 		if res != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": res})
 			return
 		}
 
 		cnt, err := users.CountDocuments(ctx, bson.M{"email": user.Email})
+		// fmt.Println(3)
 		if err != nil {
 			log.Panic((err))
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
+		// fmt.Println(4)
 		if cnt > 0 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "duplicate user"})
 			return
 		}
 
 		cnt, err = users.CountDocuments(ctx, bson.M{"phone": user.Phone})
+		// fmt.Println(5)
 		defer cancel()
 		if err != nil {
 			log.Panic(err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
+		// fmt.Println(6)
 		if cnt > 0 {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "phone number already used"})
 			return
@@ -198,8 +204,8 @@ func Signup() gin.HandlerFunc {
 }
 
 func Login() gin.HandlerFunc {
-	return func(c *gin.Context)  {
-		ctx, cancel := context.WithTimeout(context.Background(), 100 * time.Second)
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 		var found models.User
 		var user models.User
@@ -208,7 +214,7 @@ func Login() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err})
 			return
 		}
-		
+
 		err = users.FindOne(ctx, bson.M{"email": user.Email}).Decode(&found)
 		defer cancel()
 		if err != nil {
@@ -223,11 +229,13 @@ func Login() gin.HandlerFunc {
 			fmt.Println(msg)
 			return
 		}
-		tok, rf, _ := gen.Generate(*user.Email, *user.FirstName, *user.LastName, *user.Phone)
+		// fmt.Println("Verified")
+		tok, rf, _ := gen.Generate(*found.Email, *found.FirstName, *found.LastName, *found.Phone)
+		print(tok)
 		defer cancel()
 
 		gen.UpdateTok(tok, rf, found.UID)
 		c.JSON(http.StatusFound, found)
 
- 	}
+	}
 }
