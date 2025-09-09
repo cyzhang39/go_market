@@ -158,7 +158,7 @@ func AddressDelete() gin.HandlerFunc {
 		if err != nil {
 			ctx.IndentedJSON(http.StatusInternalServerError, "Internal server error")
 		}
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 100 * time.Second)
 		defer cancel()
 
 		idx := bson.D{primitive.E{Key: "id", Value: uHex}}

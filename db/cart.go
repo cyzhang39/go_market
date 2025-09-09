@@ -105,7 +105,7 @@ func CartBuy(ctx context.Context, users *mongo.Collection, uid string) error {
 	order.Price = float64(price)
 
 	idx := bson.D{primitive.E{Key: "id", Value: uHex}}
-	update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "orders", Value: order}}}}
+	update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "status", Value: order}}}}
 	_, err = users.UpdateMany(ctx, idx, update)
 	if err != nil {
 		log.Println(err)
@@ -118,7 +118,7 @@ func CartBuy(ctx context.Context, users *mongo.Collection, uid string) error {
 	}
 
 	idx2 := bson.D{primitive.E{Key: "id", Value: uHex}}
-	update2 := bson.M{"$push": bson.M{"orders.$[].cart": bson.M{"$each": user.Cart}}}
+	update2 := bson.M{"$push": bson.M{"statu8s.$[].cart": bson.M{"$each": user.Cart}}}
 	_, err = users.UpdateOne(ctx, idx2, update2)
 	if err != nil {
 		log.Println(err)
@@ -148,7 +148,7 @@ func Buy(ctx context.Context, products *mongo.Collection, users *mongo.Collectio
 	order.OrderTime = time.Now()
 	order.Cart = make([]models.UserProd, 0)
 	order.Payment.Cash = true
-	
+	// check product exists
 	err = products.FindOne(ctx, bson.D{primitive.E{Key: "id", Value: pid}}).Decode(&uProd)
 	if err != nil {
 		log.Println(err)
@@ -156,14 +156,14 @@ func Buy(ctx context.Context, products *mongo.Collection, users *mongo.Collectio
 	
 	order.Price = uProd.Price
 	idx := bson.D{primitive.E{Key: "id", Value: uHex}}
-	update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "orders", Value: order}}}}
+	update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "status", Value: order}}}}
 	_, err = users.UpdateOne(ctx, idx, update)
 	if err != nil {
 		log.Println(err)
 	}
 
 	idx2 := bson.D{primitive.E{Key: "id", Value: uHex}}
-	update2 := bson.M{"$push": bson.M{"orders.$[].cart": uProd}}
+	update2 := bson.M{"$push": bson.M{"status.$[].cart": uProd}}
 	_, err = users.UpdateOne(ctx, idx2, update2)
 	if err != nil {
 		log.Println(err)

@@ -230,8 +230,7 @@ func Login() gin.HandlerFunc {
 			return
 		}
 		// fmt.Println("Verified")
-		tok, rf, _ := gen.Generate(*found.Email, *found.FirstName, *found.LastName, *found.Phone)
-		print(tok)
+		tok, rf, _ := gen.Generate(*found.Email, *found.FirstName, *found.LastName, found.UID)
 		defer cancel()
 
 		gen.UpdateTok(tok, rf, found.UID)

@@ -149,7 +149,7 @@ func (app *App) CartBuy() gin.HandlerFunc {
 			_ = ctx.AbortWithError(http.StatusBadRequest, errors.New("Invalid user id"))
 			// return
 		}
-		c, cancel := context.WithTimeout(context.Background(), 100 * time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 
 		err := db.CartBuy(c, app.users, uid)
@@ -182,7 +182,7 @@ func (app *App) Buy() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusInternalServerError)
 			return
 		}
-		c, cancel := context.WithTimeout(context.Background(), 8*time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 8 * time.Second)
 		defer cancel()
 
 		err = db.Buy(c, app.products, app.users, pHex, uid)

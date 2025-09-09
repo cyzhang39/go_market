@@ -59,6 +59,7 @@ func ValidateTok(signed string) (claims *Signature, msg string) {
 	tok, err := jwt.ParseWithClaims(signed, &Signature{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(SECRET), nil
 	})
+
 	if err != nil {
 		msg = err.Error()
 		return
