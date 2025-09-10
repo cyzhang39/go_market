@@ -2,7 +2,7 @@ package auth
 
 import (
 	"context"
-	"fmt"
+	// "fmt"
 	"log"
 	"os"
 	"time"
@@ -27,7 +27,7 @@ var SECRET = os.Getenv("SECRET_KEY")
 var users *mongo.Collection = db.CollectionDB(db.Client, "users")
 
 func Generate(email string, fName string, lName string, uid string) (signed string, refresh string, err error) {
-	fmt.Println(SECRET != "")
+	// fmt.Println(SECRET != "")
 	sig := &Signature{
 		Email:          email,
 		FirstName:      fName,

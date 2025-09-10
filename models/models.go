@@ -7,27 +7,35 @@ import (
 )
 
 type User struct {
-	ID          primitive.ObjectID `json:"id" bson:"id"`
-	FirstName   *string            `json:"firstName" validate:"required,min=1,max=25"`
-	LastName    *string            `json:"lastName" validate:"required,min=1,max=25"`
-	Password    *string            `json:"password" validate:"required,min=8,max=32"`
-	Email       *string            `json:"email" validate:"email,required"`
-	Phone       *string            `json:"phone"`
-	Token       *string            `json:"token"`
-	Refresh      *string            `json:"refresh"`
-	CreateTime  time.Time          `json:"createTime"`
-	UpdateTime  time.Time          `json:"updateTime"`
-	UID         string             `json:"uid"`
-	Cart        []UserProd         `json:"cart" bson:"cart"`
-	AddressInfo []Address          `json:"addressInfo" bson:"addressInfo"`
-	Status      []Order            `json:"status" bson:"status"`
+	ID        primitive.ObjectID `json:"id" bson:"id"`
+	FirstName *string            `json:"firstName" validate:"required,min=1,max=25"`
+	LastName  *string            `json:"lastName" validate:"required,min=1,max=25"`
+	Password  *string            `json:"password" validate:"required,min=8,max=32"`
+	Email     *string            `json:"email" validate:"email,required"`
+	Phone     *string            `json:"phone"`
+	Verified  bool               `json:"verified" bson:"verified"`
+	// VerifyExp   time.Time          `json:"verifyexp" bson:"verifyexp"`
+	Code        string     `json:"code" bson:"code"`
+	Token       *string    `json:"token"`
+	Refresh     *string    `json:"refresh"`
+	CreateTime  time.Time  `json:"createTime"`
+	UpdateTime  time.Time  `json:"updateTime"`
+	UID         string     `json:"uid"`
+	Cart        []UserProd `json:"cart" bson:"cart"`
+	AddressInfo []Address  `json:"addressInfo" bson:"addressInfo"`
+	Status      []Order    `json:"status" bson:"status"`
+}
+
+type Verification struct {
+	Email string `json:"email" validate:"email,required"`
+	Code  string `json:"code" validate:"required,len=6"`
 }
 
 type Product struct {
 	ID     primitive.ObjectID `bson:"id"`
 	Name   *string            `json:"name"`
-	Price  *float64           `json:"price"`
-	Rating *float32           `json:"rating"`
+	Price  *float64           `json:"price" validate:"gte=0"`
+	Rating *float32           `json:"rating" validate:"gte=0,lte=5"`
 	Img    *string            `json:"img"`
 }
 
@@ -44,7 +52,7 @@ type Address struct {
 	House  *string            `json:"house" bson:"house"`
 	Street *string            `json:"street" bson:"street"`
 	City   *string            `json:"city" bson:"city"`
-	Postal *string             `json:"postal" bson:"postal"`
+	Postal *string            `json:"postal" bson:"postal"`
 }
 
 type Order struct {

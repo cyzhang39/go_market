@@ -7,9 +7,10 @@ import (
 
 func Routes(route *gin.Engine) {
 	route.POST("/users/signup", src.Signup())
+	route.POST("/users/verify", src.VerifyEmail())
 	route.POST("/users/login", src.Login())
 	route.GET("/users/view", src.View())
 	route.GET("/users/search", src.Search())
-	route.POST("/admin/product", src.AdminAdd())
+	route.POST("/users/listItem", src.ListItem())
 
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -73,7 +74,7 @@ func View() gin.HandlerFunc {
 	}
 }
 
-func AdminAdd() gin.HandlerFunc {
+func ListItem() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		var prods models.Product
@@ -83,6 +84,13 @@ func AdminAdd() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+
+		err = validate.Struct(prods)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
 		prods.ID = primitive.NewObjectID()
 		_, err = products.InsertOne(c, prods)
 		if err != nil {
@@ -179,15 +187,28 @@ func Signup() gin.HandlerFunc {
 			return
 		}
 
+		now := time.Now()
+
 		hPassword := HashPassword(*user.Password)
 		user.Password = &hPassword
-		user.CreateTime, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-		user.UpdateTime, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+		user.CreateTime, _ = time.Parse(time.RFC3339, now.Format(time.RFC3339))
+		user.UpdateTime, _ = time.Parse(time.RFC3339, now.Format(time.RFC3339))
 		user.ID = primitive.NewObjectID()
 		user.UID = user.ID.Hex()
-		tok, rf, _ := gen.Generate(*user.Email, *user.FirstName, *user.LastName, *user.Phone)
-		user.Token = &tok
-		user.Refresh = &rf
+
+		code := fmt.Sprintf("%06d", rand.Intn(1000000))
+		hcode, _ := bcrypt.GenerateFromPassword([]byte(code), bcrypt.DefaultCost)
+		user.Verified = false
+		user.Code = string(hcode)
+		// user.VerifyExp = now.Add(15 * time.Minute)
+
+		// tok, rf, _ := gen.Generate(*user.Email, *user.FirstName, *user.LastName, *user.Phone)
+		// user.Token = &tok
+		// user.Refresh = &rf
+
+		user.Token = nil
+		user.Refresh = nil
+
 		user.Cart = make([]models.UserProd, 0)
 		user.AddressInfo = make([]models.Address, 0)
 		user.Status = make([]models.Order, 0)
@@ -198,13 +219,58 @@ func Signup() gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusCreated, "Successfully signed up")
+		// c.JSON(http.StatusCreated, "Successfully signed up")
+		c.JSON(http.StatusCreated, gin.H{
+			"message":  "A 6-digit verification is sent to your email, please enter the code to verify.",
+			"dev_code": code,
+			"email":    *user.Email,
+		})
+
+	}
+}
+
+func VerifyEmail() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		c, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		var body models.Verification
+		err := ctx.BindJSON(&body)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		var found models.User
+		err = users.FindOne(c, bson.M{"email": body.Email}).Decode(&found)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email or verification code"})
+		}
+		if found.Verified {
+			ctx.JSON(http.StatusOK, gin.H{"message": "Email already verified"})
+			return
+		}
+		// if time.Now().After(found.VerifyExp) {
+		// 	ctx.JSON(http.StatusBadRequest, gin.H{"error": "Verification code has expired"})
+		// 	return
+		// }
+		tok, rf, _ := gen.Generate(*found.Email, *found.FirstName, *found.LastName, *found.Phone)
+		idx := bson.D{primitive.E{Key: "id", Value: found.ID}}
+		update := bson.M{"$set": bson.M{"verified": true, "token": tok, "refresh": rf, "updateTime": time.Now()}}
+		_, err = users.UpdateOne(c, idx, update)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong in database"})
+			return
+		}
+		// fmt.Println(found.Verified)
+		ctx.JSON(http.StatusOK, gin.H{"message": "email verified"})
 
 	}
 }
 
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// fmt.Println("Sanity Check")
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 		var found models.User
@@ -214,14 +280,19 @@ func Login() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err})
 			return
 		}
-
+		// fmt.Println(1)
 		err = users.FindOne(ctx, bson.M{"email": user.Email}).Decode(&found)
 		defer cancel()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid username or password"})
 			return
 		}
-
+		// fmt.Println(2)
+		if !found.Verified {
+			c.JSON(http.StatusForbidden, gin.H{"error": "Account not verified, please verify to continue."})
+			return
+		}
+		// fmt.Println(3)
 		isValid, msg := Verify(*user.Password, *found.Password)
 		defer cancel()
 		if !isValid {
@@ -234,6 +305,7 @@ func Login() gin.HandlerFunc {
 		defer cancel()
 
 		gen.UpdateTok(tok, rf, found.UID)
+		// fmt.Println("DONE")
 		c.JSON(http.StatusFound, found)
 
 	}
