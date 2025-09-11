@@ -22,6 +22,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("Chat initialization failed: %v", err)
 	}
+	err = db.InitReviews(db.Client, "goMarket")
+	if err != nil {
+		log.Fatalf("Chat initialization failed: %v", err)
+	}
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -37,6 +41,8 @@ func main() {
 	router.PUT("/addressworkedit", src.WorkEdit())
 	router.GET("/addressdel", src.AddressDelete())
 	routes.ChatRoutes(router)
+	routes.ReviewRoutes(router)
+
 
 	log.Fatal(router.Run(":" + port))
 }

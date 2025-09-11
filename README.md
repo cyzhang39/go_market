@@ -141,10 +141,10 @@ http://localhost:8000/users/listItem
 Request Body:
 ```
 {
-    "name": "textbook",
-    "price": 100,
-    "rating": 5.0,
-    "img": "textbook.png"
+    "name": "pen",
+    "price": 9.99,
+    "img": "pencil.png",
+    "description": "black pen 0.5mm with replacable ink"
 }
 ```
 Returned Body:
@@ -159,26 +159,52 @@ Returned Body:
 ```
 [
     {
-        "ID": <itemID>,
-        "name": "textbook",
-        "price": 100,
-        "rating validate:": null,
-        "img": "textbook.png"
+        "ID": "68c34222df9bb0af3283176a",
+        "name": "pencil",
+        "price": 5,
+        "img": "pencil.png",
+        "description": null,
+        "ratingAvg": 0,
+        "ratingCnt": 0,
+        "ratingSum": 0
+    },
+    {
+        "ID": "68c342b0df9bb0af3283176c",
+        "name": "pen",
+        "price": 9.99,
+        "img": "pencil.png",
+        "description": "black pen 0.5mm with replacable ink",
+        "ratingAvg": 0,
+        "ratingCnt": 0,
+        "ratingSum": 0
     }
 ]
 ```
 ### Search for item (GET)
-http://localhost:8000/users/search?name=textbook  
+http://localhost:8000/users/search?name=pen  
 No request body. 
 Returned Body:
 ```
 [
     {
-        "ID": <itemID>,
-        "name": "textbook",
-        "price": 100,
-        "rating validate:": null,
-        "img": "textbook.png"
+        "ID": "68c34222df9bb0af3283176a",
+        "name": "pencil",
+        "price": 5,
+        "img": "pencil.png",
+        "description": null,
+        "ratingAvg": 0,
+        "ratingCnt": 0,
+        "ratingSum": 0
+    },
+    {
+        "ID": "68c342b0df9bb0af3283176c",
+        "name": "pen",
+        "price": 9.99,
+        "img": "pencil.png",
+        "description": "black pen 0.5mm with replacable ink",
+        "ratingAvg": 0,
+        "ratingCnt": 0,
+        "ratingSum": 0
     }
 ]
 ```
@@ -421,4 +447,45 @@ Returned Body:
 Now if you run list messages, you will see user2's id being appended to "readBy".  
 If you run list all chats, you will see user2's unreadby decrease to 0.  
 
+### List reviews (GET)
+http://localhost:8000/products/productID/reviews?limit=5  
+Displays 5 reviews.  
+No request body.  
+Attach ``<token>`` to request Headers.  
+Returned Body:
+If no review, 
+```
+null
+```
+If with review:
+```
+[
+    {
+        "id": <review id>,
+        "pid": <product id>,
+        "uid": <user id>,
+        "rating": 4.5,
+        "review": "Solid pen, smooth to write and steady build",
+        "createdAt": "2025-09-11T22:05:20.659Z",
+        "updatedAt": "2025-09-11T22:05:20.659Z"
+    }
+]
+```
 
+### make review
+http://localhost:8000/products/productID/reviews?userID=userID   
+Attach ``<token>`` to request Headers.  
+Request Body:
+```
+{
+  "rating": 4.5,
+  "review": "Solid pen, smooth to write and steady build"
+}
+```
+Returned Body:
+```
+{
+    "status": "created"
+}
+```
+The newly added review will be returned from list reviews requetsed, and the prodcut's ratings will be updated accordingly.  

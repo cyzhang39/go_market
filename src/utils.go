@@ -76,7 +76,7 @@ func View() gin.HandlerFunc {
 
 func ListItem() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 100 * time.Second)
 		var prods models.Product
 		defer cancel()
 		err := ctx.BindJSON(&prods)
@@ -84,6 +84,10 @@ func ListItem() gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+
+		prods.RatingAvg = 0
+		prods.RatingCnt = 0
+		prods.RatingSum = 0
 
 		err = validate.Struct(prods)
 		if err != nil {

@@ -7,23 +7,22 @@ import (
 )
 
 type User struct {
-	ID        primitive.ObjectID `json:"id" bson:"id"`
-	FirstName *string            `json:"firstName" validate:"required,min=1,max=25"`
-	LastName  *string            `json:"lastName" validate:"required,min=1,max=25"`
-	Password  *string            `json:"password" validate:"required,min=8,max=32"`
-	Email     *string            `json:"email" validate:"email,required"`
-	Phone     *string            `json:"phone"`
-	Verified  bool               `json:"verified" bson:"verified"`
-	// VerifyExp   time.Time          `json:"verifyexp" bson:"verifyexp"`
-	Code        string     `json:"code" bson:"code"`
-	Token       *string    `json:"token"`
-	Refresh     *string    `json:"refresh"`
-	CreateTime  time.Time  `json:"createTime"`
-	UpdateTime  time.Time  `json:"updateTime"`
-	UID         string     `json:"uid"`
-	Cart        []UserProd `json:"cart" bson:"cart"`
-	AddressInfo []Address  `json:"addressInfo" bson:"addressInfo"`
-	Status      []Order    `json:"status" bson:"status"`
+	ID          primitive.ObjectID `json:"id" bson:"id"`
+	FirstName   *string            `json:"firstName" validate:"required,min=1,max=25"`
+	LastName    *string            `json:"lastName" validate:"required,min=1,max=25"`
+	Password    *string            `json:"password" validate:"required,min=8,max=32"`
+	Email       *string            `json:"email" validate:"email,required"`
+	Phone       *string            `json:"phone"`
+	Verified    bool               `json:"verified" bson:"verified"`
+	Code        string             `json:"code" bson:"code"`
+	Token       *string            `json:"token"`
+	Refresh     *string            `json:"refresh"`
+	CreateTime  time.Time          `json:"createTime"`
+	UpdateTime  time.Time          `json:"updateTime"`
+	UID         string             `json:"uid"`
+	Cart        []UserProd         `json:"cart" bson:"cart"`
+	AddressInfo []Address          `json:"addressInfo" bson:"addressInfo"`
+	Status      []Order            `json:"status" bson:"status"`
 }
 
 type Verification struct {
@@ -32,11 +31,14 @@ type Verification struct {
 }
 
 type Product struct {
-	ID     primitive.ObjectID `bson:"id"`
-	Name   *string            `json:"name"`
-	Price  *float64           `json:"price" validate:"gte=0"`
-	Rating *float32           `json:"rating" validate:"gte=0,lte=5"`
-	Img    *string            `json:"img"`
+	ID          primitive.ObjectID `bson:"id"`
+	Name        *string            `json:"name"`
+	Price       *float64           `json:"price" validate:"gte=0"`
+	Img         *string            `json:"img"`
+	Description *string            `json:"description" bson:"description"`
+	RatingAvg   float32            `json:"ratingAvg" bson:"ratingAvg"`
+	RatingCnt   int64              `json:"ratingCnt" bson:"ratingCnt"`
+	RatingSum   float64            `json:"ratingSum" bson:"ratingSum"`
 }
 
 type UserProd struct {
@@ -91,4 +93,14 @@ type Message struct {
 	Text      string               `json:"text" bson:"text" validate:"required,min=1,max=4000"`
 	CreatedAt time.Time            `json:"createdAt" bson:"createdAt"`
 	ReadBy    []primitive.ObjectID `json:"readBy" bson:"readBy"`
+}
+
+type Review struct {
+	ID        primitive.ObjectID `json:"id" bson:"id"`
+	PID       primitive.ObjectID `json:"pid" bson:"pid"`
+	UID       primitive.ObjectID `json:"uid" bson:"uid"`
+	Rating    float32            `json:"rating" bson:"rating" validate:"gte=0,lte=5"`
+	Review    string             `json:"review" bson:"review" validate:"required,min=1,max=4000"`
+	CreatedAt time.Time          `json:"createdAt" bson:"createdAt"`
+	UpdatedAt time.Time          `json:"updatedAt" bson:"updatedAt"`
 }

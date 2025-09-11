@@ -59,3 +59,20 @@ func InitChats(client *mongo.Client, name string) error {
 
 	return nil
 }
+
+var Reviews *mongo.Collection
+
+func InitReviews(client *mongo.Client, name string) error {
+	Reviews = client.Database(name).Collection("reviews")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10 * time.Second)
+	defer cancel()
+
+	_, err := Reviews.Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{{Key: "pid", Value: 1}, {Key: "uid", Value: 1}}, Options: options.Index().SetUnique(true)})
+	if err != nil {
+		log.Println("create reviews unique index:", err)
+	}
+	_, _ = Reviews.Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.D{{Key: "pid", Value: 1},	{Key: "updatedAt", Value: -1},}})
+
+	return nil
+}
