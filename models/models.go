@@ -68,3 +68,27 @@ type Payment struct {
 	Online bool
 	Cash   bool
 }
+
+type Chat struct {
+	ID          primitive.ObjectID   `json:"id" bson:"id"`
+	Members     []primitive.ObjectID `json:"members" bson:"members"`
+	CreatedAt   time.Time            `json:"createdAt" bson:"createdAt"`
+	UpdatedAt   time.Time            `json:"updatedAt" bson:"updatedAt"`
+	LastMessage *MessagePreview      `json:"lastMessage" bson:"lastMessage"`
+	UnreadBy    map[string]int       `json:"unreadBy" bson:"unreadBy"`
+}
+
+type MessagePreview struct {
+	Text      string             `json:"text" bson:"text"`
+	SenderID  primitive.ObjectID `json:"senderId" bson:"senderId"`
+	CreatedAt time.Time          `json:"createdAt" bson:"createdAt"`
+}
+
+type Message struct {
+	ID        primitive.ObjectID   `json:"id" bson:"id"`
+	ChatID    primitive.ObjectID   `json:"chatId" bson:"chatId"`
+	SenderID  primitive.ObjectID   `json:"senderId" bson:"senderId"`
+	Text      string               `json:"text" bson:"text" validate:"required,min=1,max=4000"`
+	CreatedAt time.Time            `json:"createdAt" bson:"createdAt"`
+	ReadBy    []primitive.ObjectID `json:"readBy" bson:"readBy"`
+}

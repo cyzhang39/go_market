@@ -271,3 +271,120 @@ Returned Body:
 "Order placed successfully"
 ```
 
+### Start chat (POST)
+http://localhost:8000/chats?userID=userID  
+Start chat with another user.  
+Attach ``<token>`` to request Headers.  
+Request Body:
+```
+{ 
+    "peerId": <Other UserID> 
+}
+```
+Returned Body:
+```
+{
+    "id": <Chat ID>,
+    "members": [
+        "User1 ID",
+        "User2 ID"
+    ],
+    "createdAt": "2025-09-11T00:51:03.506648081-04:00",
+    "updatedAt": "2025-09-11T00:51:03.506648081-04:00",
+    "lastMessage": null,
+    "unreadBy": {
+        "User1 ID": 0,
+        "User2 ID": 0
+    }
+}
+```
+
+### List all chats (GET)
+http://localhost:8000/chats?userID=userID  
+No request body.  
+Attach ``<token>`` to request Headers.  
+Returned Body:
+```
+[
+    {
+        "id": <Chat ID>,
+        "members": [
+            "User1 ID",
+            "User2 ID"
+        ],
+        "createdAt": "2025-09-11T04:51:03.506Z",
+        "updatedAt": "2025-09-11T04:51:03.506Z",
+        "lastMessage": null,
+        "unreadBy": {
+            "User1 ID": 0,
+            "User2 ID": 0
+        }
+    }
+]
+```
+
+### Send message (POST)
+http://localhost:8000/chats/ChatID/messages?userID=UserID  
+Attach ``<token>`` to request Headers.  
+Request Body:
+```
+{ 
+    "text": "hello" 
+}
+```
+Returned Body:
+```
+{
+    "id": <Message ID>,
+    "chatId": <Chat ID>,
+    "senderId": <User1 ID>,
+    "text": "hello",
+    "createdAt": "2025-09-11T00:58:12.721520423-04:00",
+    "readBy": [
+        <User2 ID>
+    ]
+}
+```
+If call list chats after sending a message, you will see the receiver's unreadby increase by 1 since there is now a newly sent message.  
+
+### List messages (GET)
+http://localhost:8000/chats/chatID/messages?userID=userID&limit=10  
+Displays the last 10 messages in a chat.  
+No request body.  
+Attach ``<token>`` to request Headers.  
+Returned Body:
+```
+[
+    {
+        "id": <Message ID>,
+        "chatId": <Chat ID>,
+        "senderId": <Sender ID>,
+        "text": "hello",
+        "createdAt": "2025-09-11T04:58:12.721Z",
+        "readBy": [
+            <User1 ID>
+        ]
+    }
+]
+```
+
+### Read message (POST)
+http://localhost:8000/chats/chatID/read?userID=user2ID  
+Here we simulate user2, the receiver, reads the message.  
+Attach user2's ``<token>`` to request Headers.  
+Request Body:
+```
+{ 
+    "peerId": <User1 ID>
+}
+```
+Returned Body:
+```
+{
+    "status": "ok"
+}
+```
+Now if you run list messages, you will see user2's id being appended to "readBy".  
+If you run list all chats, you will see user2's unreadby decrease to 0.  
+
+

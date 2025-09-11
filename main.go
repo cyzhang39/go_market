@@ -18,6 +18,10 @@ func main() {
 	}
 
 	server := src.NewApp(db.CollectionDB(db.Client, "products"), db.CollectionDB(db.Client, "users"))
+	err := db.InitChats(db.Client, "goMarket")
+	if err != nil {
+		log.Fatalf("Chat initialization failed: %v", err)
+	}
 
 	router := gin.New()
 	router.Use(gin.Logger())
@@ -32,6 +36,7 @@ func main() {
 	router.PUT("/addresshomeedit", src.HomeEdit())
 	router.PUT("/addressworkedit", src.WorkEdit())
 	router.GET("/addressdel", src.AddressDelete())
+	routes.ChatRoutes(router)
 
 	log.Fatal(router.Run(":" + port))
 }
