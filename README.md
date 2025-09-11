@@ -13,8 +13,8 @@ An API that simulates backend behavior of a marketplace.
 | Login                    | `POST`     | [/users/login](#login-post)            | Log in and get token                             |
 | **Marketplace**          |            |                                        |                                                  |
 | List Item                | `POST`     | [/users/listItem](#list-an-item)       | Add a new product                                |
-| View All Items           | `GET`      | [/users/view](#view-all-market-items-get) | Fetch all available items                      |
-| Search Item              | `GET`      | [/users/search?name=](#search-for-item-get) | Search items by name                         |
+| View All Items           | `GET`      | [/users/view](#view-all-market-items-get) | Fetch all available items                     |
+| Search Item              | `GET`      | [/users/search?name=](#search-for-item-get) | Search items by name                        |
 | **Cart Management**      |            |                                        |                                                  |
 | Add to Cart              | `GET`      | [/add](#add-item-to-cart-get)          | Add item to user’s cart                          |
 | List Cart                | `GET`      | [/list](#list-items-in-cart-get)       | Get user’s cart items                            |
@@ -29,9 +29,12 @@ An API that simulates backend behavior of a marketplace.
 | **Chat & Messaging**     |            |                                        |                                                  |
 | Start Chat               | `POST`     | [/chats](#start-chat-post)             | Start chat with another user                     |
 | List Chats               | `GET`      | [/chats](#list-all-chats-get)          | Get all chats for user                           |
-| Send Message             | `POST`     | [/chats/:chatID/messages](#send-message-post) | Send message in a chat                      |
-| List Messages            | `GET`      | [/chats/:chatID/messages](#list-messages-get) | List messages in a chat                      |
+| Send Message             | `POST`     | [/chats/:chatID/messages](#send-message-post) | Send message in a chat                    |
+| List Messages            | `GET`      | [/chats/:chatID/messages](#list-messages-get) | List messages in a chat                   |
 | Mark Messages Read       | `POST`     | [/chats/:chatID/read](#read-message-post) | Mark messages as read                         |
+| **Product Reviews**      |            |                                        |                                                  |
+| List Reviews             | `GET `     | [/products/:productID/reviews](#list-reviews-get) | List reviews of a product             |
+| make review              | `POST`     | [/products/:productID/reviews](#make-review-post) | Make review for a product             |
 
 
 
@@ -472,7 +475,7 @@ If with review:
 ]
 ```
 
-### make review
+### make review (POST)
 http://localhost:8000/products/productID/reviews?userID=userID   
 Attach ``<token>`` to request Headers.  
 Request Body:
