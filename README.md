@@ -1,6 +1,40 @@
 # Go Marketplace
 An API that simulates backend behavior of a marketplace.
 
+<a name="api-endpoints-overview"></a>
+
+## 📌 API Endpoints Overview
+
+| **Feature**              | **Method** | **Endpoint**                           | **Description**                                  |
+|--------------------------|------------|----------------------------------------|--------------------------------------------------|
+| **User Authentication**  |            |                                        |                                                  |
+| Sign Up                  | `POST`     | [/users/signup](#sign-up-post)         | Register a new user                              |
+| Verify                   | `POST`     | [/users/verify](#verify-post)          | Verify account using code                        |
+| Login                    | `POST`     | [/users/login](#login-post)            | Log in and get token                             |
+| **Marketplace**          |            |                                        |                                                  |
+| List Item                | `POST`     | [/users/listItem](#list-an-item)       | Add a new product                                |
+| View All Items           | `GET`      | [/users/view](#view-all-market-items-get) | Fetch all available items                      |
+| Search Item              | `GET`      | [/users/search?name=](#search-for-item-get) | Search items by name                         |
+| **Cart Management**      |            |                                        |                                                  |
+| Add to Cart              | `GET`      | [/add](#add-item-to-cart-get)          | Add item to user’s cart                          |
+| List Cart                | `GET`      | [/list](#list-items-in-cart-get)       | Get user’s cart items                            |
+| Remove from Cart         | `GET`      | [/remove](#remove-item-from-cart-get)  | Remove item from cart                            |
+| Checkout Cart            | `GET`      | [/checkout](#cart-checkout-get)        | Checkout all items in cart                       |
+| Instant Buy              | `GET`      | [/buy](#buy-item-instantly-get)        | Buy item instantly without adding to cart        |
+| **Address Management**   |            |                                        |                                                  |
+| Add Address              | `POST`     | [/addressadd](#add-address-post)       | Add home or work address                         |
+| Delete Address           | `GET`      | [/addressdel](#delete-address-get)     | Delete all addresses                             |
+| Edit Home Address        | `PUT`      | [/addresshomeedit](#edit-home-address-put) | Update home address                          |
+| Edit Work Address        | `PUT`      | [/addressworkedit](#edit-work-address-put) | Update work address                          |
+| **Chat & Messaging**     |            |                                        |                                                  |
+| Start Chat               | `POST`     | [/chats](#start-chat-post)             | Start chat with another user                     |
+| List Chats               | `GET`      | [/chats](#list-all-chats-get)          | Get all chats for user                           |
+| Send Message             | `POST`     | [/chats/:chatID/messages](#send-message-post) | Send message in a chat                      |
+| List Messages            | `GET`      | [/chats/:chatID/messages](#list-messages-get) | List messages in a chat                      |
+| Mark Messages Read       | `POST`     | [/chats/:chatID/read](#read-message-post) | Mark messages as read                         |
+
+
+
 ## Setup
 Make sure you have GoLang installed  
 https://go.dev/doc/install
