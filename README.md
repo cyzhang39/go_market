@@ -31,7 +31,7 @@ go run main.go
 ## Calling API
 Here I'm using postman  
 You can view the collection here.  
-https://www.postman.com/czhang35-b1391359-892575/workspace/go-market-workspace/collection/47550840-389b2ade-6297-4711-b75e-c930c28978d3?action=share&source=copy-link&creator=47550840  
+https://www.postman.com/czhang35-b1391359-892575/workspace/go-market-workspace/collection/47550840-78e3d3a8-f6b2-48c0-bcc5-52f213f78c19?action=share&creator=47550840  
 
 ## 📌 API Endpoints Overview
 
