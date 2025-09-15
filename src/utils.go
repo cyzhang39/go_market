@@ -76,7 +76,7 @@ func View() gin.HandlerFunc {
 
 func ListItem() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		c, cancel := context.WithTimeout(context.Background(), 100 * time.Second)
+		c, cancel := context.WithTimeout(context.Background(), 100*time.Second)
 		var prods models.Product
 		defer cancel()
 		err := ctx.BindJSON(&prods)

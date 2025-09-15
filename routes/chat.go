@@ -271,6 +271,7 @@ func Read(c *gin.Context) {
 	_, err = db.Chats.UpdateOne(ctx, idx, update)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Something went wrong, could not mark as read"})
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"status": "ok"})

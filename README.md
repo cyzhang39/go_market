@@ -3,6 +3,36 @@ An API that simulates backend behavior of a marketplace.
 
 <a name="api-endpoints-overview"></a>
 
+## Setup
+Make sure you have GoLang installed  
+https://go.dev/doc/install
+
+Clone the repo and install required packages.
+```
+git clone https://github.com/cyzhang39/go_market.git
+go mod tidy
+```
+
+## Start
+Docker for running database
+```
+docker-compose up -d
+```
+
+Run API
+```
+// remember to set a secret key
+export SECRET_KEY=TOPSECRET
+go run main.go
+```
+
+
+
+## Calling API
+Here I'm using postman  
+You can view the collection here.  
+https://www.postman.com/czhang35-b1391359-892575/workspace/go-market-workspace/collection/47550840-389b2ade-6297-4711-b75e-c930c28978d3?action=share&source=copy-link&creator=47550840  
+
 ## 📌 API Endpoints Overview
 
 | **Feature**              | **Method** | **Endpoint**                           | **Description**                                  |
@@ -35,36 +65,6 @@ An API that simulates backend behavior of a marketplace.
 | **Product Reviews**      |            |                                        |                                                  |
 | List Reviews             | `GET `     | [/products/:productID/reviews](#list-reviews-get) | List reviews of a product             |
 | make review              | `POST`     | [/products/:productID/reviews](#make-review-post) | Make review for a product             |
-
-
-
-## Setup
-Make sure you have GoLang installed  
-https://go.dev/doc/install
-
-Clone the repo and install required packages.
-```
-git clone https://github.com/cyzhang39/go_market.git
-go mod tidy
-```
-
-## Start
-Docker for running database
-```
-docker-compose up -d
-```
-
-Run API
-```
-// remember to set a secret key
-export SECRET_KEY=TOPSECRET
-go run main.go
-```
-
-
-
-## Calling API
-Here I'm using postman
 
 ### Sign up (POST)
 http://localhost:8000/users/signup  
